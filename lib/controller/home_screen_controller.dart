@@ -16,7 +16,7 @@ class HomeScreenController with ChangeNotifier {
       url,
       body: jsonEncode({
         "category": "movies",
-        "language": "telugu",
+        "language": "kannada",
         "genre": "all",
         "sort": "voting",
       }),

@@ -7,8 +7,8 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Future.delayed(Duration(seconds: 3)).then((value) {
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => RegistrationScreen()));
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => RegistrationScreen()));
     });
     return Scaffold(
       body: Center(
@@ -18,7 +18,6 @@ class SplashScreen extends StatelessWidget {
             CircleAvatar(
               backgroundImage: AssetImage("assets/images/logo.png"),
               radius: 70,
-              backgroundColor: Colors.amber,
             ),
             Text(
               "Geeksynergy Task",

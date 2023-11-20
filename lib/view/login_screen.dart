@@ -129,8 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   showSnackbar() {
-    final snackbar =
-        SnackBar(content: Text("Username and password does not match"));
+    final snackbar = SnackBar(content: Text('Invalid Credentials'));
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 

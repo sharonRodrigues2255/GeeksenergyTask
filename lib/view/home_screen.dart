@@ -11,6 +11,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   void initState() {
     Future.delayed(Duration.zero, () {
@@ -24,198 +25,222 @@ class _HomeScreenState extends State<HomeScreen> {
     final provider = Provider.of<HomeScreenController>(context);
 
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         title: Text("Movies"),
         actions: [
           TextButton.icon(
               onPressed: () {
-                Scaffold.of(context).openEndDrawer();
+                scaffoldKey.currentState!.openEndDrawer();
               },
-              icon: Icon(Icons.info_outline),
-              label: Text("Company info"))
+              icon: Icon(
+                Icons.info_outline,
+                color: Colors.brown,
+              ),
+              label: Text(
+                "Company info",
+                style: TextStyle(color: Colors.brown),
+              ))
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(14.0),
-        child: ListView.builder(
-            itemCount: provider.movies?.result?.length,
-            itemBuilder: (context, index) {
-              final movie = provider.movies?.result?[index];
-              final releaseDate =
-                  DateTime.fromMicrosecondsSinceEpoch(movie?.releasedDate ?? 0);
-              return Column(
-                children: [
-                  Container(
-                    height: 160,
-                    width: double.infinity,
-                    child: Row(
-                      children: [
-                        Expanded(
-                            flex: 2,
-                            child: Container(
-                              child: Row(
-                                children: [
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+        child: provider.isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : ListView.builder(
+                itemCount: provider.movies?.result?.length,
+                itemBuilder: (context, index) {
+                  final movie = provider.movies?.result?[index];
+                  var releaseDate = DateTime.fromMicrosecondsSinceEpoch(
+                      movie?.releasedDate ?? 0);
+                  return Column(
+                    children: [
+                      Container(
+                        height: 160,
+                        width: double.infinity,
+                        child: Row(
+                          children: [
+                            Expanded(
+                                flex: 2,
+                                child: Container(
+                                  child: Row(
                                     children: [
-                                      Icon(
-                                        Icons.arrow_drop_up_sharp,
-                                        size: 50,
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.arrow_drop_up_sharp,
+                                            size: 50,
+                                          ),
+                                          Text(
+                                            movie?.totalVoted.toString() ?? "",
+                                            style: TextStyle(fontSize: 25),
+                                          ),
+                                          Icon(
+                                            Icons.arrow_drop_down,
+                                            size: 50,
+                                          ),
+                                          Text("Votes")
+                                        ],
                                       ),
-                                      Text(
-                                        movie?.totalVoted.toString() ?? "",
-                                        style: TextStyle(fontSize: 25),
+                                      Expanded(
+                                        child: Card(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                image: DecorationImage(
+                                                    fit: BoxFit.cover,
+                                                    image: NetworkImage(movie
+                                                            ?.poster ??
+                                                        "https://t3.ftcdn.net/jpg/03/34/83/22/360_F_334832255_IMxvzYRygjd20VlSaIAFZrQWjozQH6BQ.jpg"))),
+                                          ),
+                                        ),
                                       ),
-                                      Icon(
-                                        Icons.arrow_drop_down,
-                                        size: 50,
-                                      ),
-                                      Text("Votes")
                                     ],
                                   ),
-                                  Expanded(
-                                    child: Card(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                            image: DecorationImage(
-                                                fit: BoxFit.cover,
-                                                image: NetworkImage(movie
-                                                        ?.poster ??
-                                                    "https://t3.ftcdn.net/jpg/03/34/83/22/360_F_334832255_IMxvzYRygjd20VlSaIAFZrQWjozQH6BQ.jpg"))),
+                                )),
+                            Expanded(
+                                flex: 3,
+                                child: Container(
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: 8,
                                       ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )),
-                        Expanded(
-                            flex: 3,
-                            child: Container(
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    height: 8,
-                                  ),
-                                  Text(
-                                    movie?.title ?? "",
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.libreBaskerville(
-                                        fontSize: 19),
-                                  ),
-                                  SizedBox(
-                                    height: 3,
-                                  ),
-                                  Text.rich(TextSpan(
-                                      text: "Genere:",
-                                      style: TextStyle(
-                                          color: Colors.grey,
-                                          fontWeight: FontWeight.bold),
-                                      children: [
-                                        TextSpan(
-                                            text: movie?.genre,
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.normal))
-                                      ])),
-                                  Text.rich(TextSpan(
-                                      text: "Director:",
-                                      style: TextStyle(
-                                          color: Colors.grey,
-                                          fontWeight: FontWeight.bold),
-                                      children: List.generate(
-                                          movie?.director?.length ?? 1,
-                                          (index) => TextSpan(
-                                              text: movie?.director?[index],
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.normal,
-                                                  color: Colors.black))))),
-                                  Text.rich(
-                                    TextSpan(
-                                        text: "Starring:",
-                                        style: TextStyle(
-                                            color: Colors.grey,
-                                            fontWeight: FontWeight.bold),
-                                        children: List.generate(
-                                            movie?.stars?.length ?? 1,
-                                            (index) => TextSpan(
-                                                text: movie?.stars?[index],
+                                      Text(
+                                        movie?.title ?? "",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.libreBaskerville(
+                                            fontSize: 19),
+                                      ),
+                                      SizedBox(
+                                        height: 3,
+                                      ),
+                                      Text.rich(TextSpan(
+                                          text: "Genere:",
+                                          style: TextStyle(
+                                              color: Colors.grey,
+                                              fontWeight: FontWeight.bold),
+                                          children: [
+                                            TextSpan(
+                                                text: movie?.genre,
                                                 style: TextStyle(
+                                                    color: Colors.black,
                                                     fontWeight:
-                                                        FontWeight.normal,
-                                                    color: Colors.black)))),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text("${movie?.runTime ?? ""} Mins |"),
-                                      Text(" ${movie?.language} |"),
-                                      Text(
-                                          "${releaseDate.day} ${getMonthName(releaseDate.month)}")
+                                                        FontWeight.normal))
+                                          ])),
+                                      Text.rich(TextSpan(
+                                          text: "Director:",
+                                          style: TextStyle(
+                                              color: Colors.grey,
+                                              fontWeight: FontWeight.bold),
+                                          children: List.generate(
+                                              movie?.director?.length ?? 1,
+                                              (index) => TextSpan(
+                                                  text: movie?.director?[index],
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                      color: Colors.black))))),
+                                      Text.rich(
+                                        TextSpan(
+                                            text: "Starring:",
+                                            style: TextStyle(
+                                                color: Colors.grey,
+                                                fontWeight: FontWeight.bold),
+                                            children: List.generate(
+                                                movie?.stars?.length ?? 1,
+                                                (index) => TextSpan(
+                                                    text: movie?.stars?[index],
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.normal,
+                                                        color: Colors.black)))),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                              "${movie?.runTime ?? ""} Mins |"),
+                                          Text(" ${movie?.language} |"),
+                                          Text(
+                                              "${releaseDate.day} ${getMonthName(releaseDate.month)}")
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text("${movie?.pageViews} views |"),
+                                          Text(
+                                              " voted by ${movie?.totalVoted} prople |"),
+                                        ],
+                                      ),
                                     ],
                                   ),
-                                  Row(
-                                    children: [
-                                      Text("${movie?.pageViews} views |"),
-                                      Text(
-                                          " voted by ${movie?.totalVoted} prople |"),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ))
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    height: 35,
-                    decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(5)),
-                    child: Center(
-                      child: Text(
-                        "Watch Trailer",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
+                                ))
+                          ],
+                        ),
                       ),
-                    ),
-                  ),
-                  Divider()
-                ],
-              );
-            }),
+                      Container(
+                        width: double.infinity,
+                        height: 35,
+                        decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Center(
+                          child: Text(
+                            "Watch Trailer",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      Divider()
+                    ],
+                  );
+                }),
       ),
       endDrawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              child: Text('Company information'),
+          children: [
+            Container(
+              height: 100,
+              child: Center(
+                  child: Row(
+                children: [
+                  SizedBox(
+                    width: 10,
+                  ),
+                  CircleAvatar(
+                    backgroundImage: AssetImage("assets/images/logo.png"),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    'Company information',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              )),
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: Colors.brown,
               ),
             ),
             ListTile(
-              title: Text('Item 1'),
-              onTap: () {},
-            ),
-            ListTile(
-              title: Text('Item 2'),
-              onTap: () {},
-            ),
-            Divider(),
-            ListTile(
-              title: Text('Company Information'),
-              subtitle: Text(
+              title: Text(
                 'Company: Geeksynergy Technologies Pvt Ltd\n'
                 'Address: Sanjayanagar, Bengaluru-56\n'
                 'Phone: XXXXXXXXX09\n'

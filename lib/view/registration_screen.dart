@@ -164,7 +164,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                   profession: selectedProfession));
                               Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
-                                      builder: (context) => HomeScreen()));
+                                      builder: (context) => LoginScreen()));
                             }
                           },
                           child: Text("Register")),
